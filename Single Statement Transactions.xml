@@ -1,0 +1,47 @@
+<export><workspace name="Single Statement Transactions"><query name="Create Test Docs" focus="true" active="true" content-source="as:12502585550486864229:" mode="xquery">(: create some sample docs :)
+
+if (xdmp:database-name(xdmp:database()) = "Documents") 
+
+then
+  (
+  xdmp:document-insert("/testA.xml", &lt;doc&gt;&lt;node&gt;hello&lt;/node&gt;&lt;/doc&gt;),
+  xdmp:document-insert("/testB.xml", &lt;doc&gt;&lt;node&gt;goodbye&lt;/node&gt;&lt;/doc&gt;)
+  )
+else
+  "please select the documents database"</query><query name="Update  - Single Statement No Explicit Commit" focus="false" active="true" content-source="as:12502585550486864229:" mode="xquery">(: 
+Run this code and then look at the content in your documents.
+
+Why didn't the update happen?
+When writing single statement transactions, the commit doesn't occur until the end of the modules execution.
+unless our code explicitly tells it to commit.
+If an error occurs before the end of execution, which we are forcing here, it will rollback.
+
+Updates made by a single statement transaction are not visible outside the statement until it completes.
+And it doesn't complete until the end of module execution or a forced commit using a semi-colon (see next tab)
+:)
+
+xquery version "1.0-ml";
+
+if (xdmp:database-name(xdmp:database()) = "Documents") 
+
+then
+  (
+  for $doc in /doc
+  return 
+    xdmp:node-replace($doc/node, &lt;node&gt;123&lt;/node&gt;)
+  ,  
+  fn:error()
+  )
+else
+  "please select the documents database"
+</query><query name="Update - Single Statement with Explicit Commit" focus="false" active="true" content-source="as:12502585550486864229:" mode="xquery">(: 
+  Run this query against your Documents database.
+  Notice the semi-colon at the end of the xdmp:node-replace 
+:)
+
+xquery version "1.0-ml";
+
+xdmp:node-replace(fn:doc("/testA.xml")/doc, &lt;node&gt;123&lt;/node&gt;);
+
+fn:error()
+</query></workspace></export>
